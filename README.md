@@ -30,8 +30,8 @@ ShieldScan Professional is a high-performance, asynchronous network auditing and
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/shieldscan.git
-   cd shieldscan
+   git clone https://github.com/tejassxo/Shield-Scan.git
+   cd Shield-Scan
    ```
 2. Install the required dependencies:
    ```bash
