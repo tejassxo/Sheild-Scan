@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import List, Optional
 from src.models.assessment import ScanResult
 
-DEFAULT_STORAGE_DIR = Path("C:/Users/tejas/.gemini/antigravity-ide/scratch/ShieldScan/exports/json")
+BASE_DIR = Path(__file__).resolve().parents[2]
+DEFAULT_STORAGE_DIR = BASE_DIR / "exports" / "json"
 
 
 class ScanStore:

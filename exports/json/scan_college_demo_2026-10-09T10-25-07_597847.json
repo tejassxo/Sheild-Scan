@@ -1,0 +1,559 @@
+{
+  "id": "scan_college_demo",
+  "target": "192.168.1.0/28",
+  "target_hosts_count": 14,
+  "profile_id": "standard_assessment",
+  "profile_name": "Standard Assessment",
+  "started_at": "2026-10-09T10:25:07.597847",
+  "completed_at": null,
+  "duration_seconds": 42.18,
+  "status": "COMPLETED",
+  "stats": {
+    "total_hosts": 3,
+    "reachable_hosts": 3,
+    "total_ports_tested": 9,
+    "open_ports": 9,
+    "closed_ports": 0,
+    "filtered_ports": 0,
+    "services_identified": 9,
+    "total_findings": 12,
+    "findings_by_severity": {
+      "INFORMATIONAL": 4,
+      "LOW": 1,
+      "MEDIUM": 4,
+      "HIGH": 3
+    }
+  },
+  "config_summary": {},
+  "notes": "",
+  "hosts": {
+    "192.168.1.1": {
+      "ip": "192.168.1.1",
+      "hostname": "gateway.local",
+      "status": "REACHABLE",
+      "os_hint": "",
+      "mac_address": "",
+      "vendor": "",
+      "latency_ms": 1.8,
+      "ports": {
+        "80": {
+          "port": 80,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "HTTP",
+            "product": "lighttpd",
+            "version": "1.4.59",
+            "banner": "lighttpd/1.4.59",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 1.9,
+          "evidence": {
+            "probe_type": "HTTP_HEAD_PROBE",
+            "observation": "HTTP 200 OK | Server: lighttpd/1.4.59",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597875",
+            "metadata": {}
+          }
+        },
+        "443": {
+          "port": 443,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "HTTPS",
+            "product": "TLS Gateway Admin",
+            "version": "TLSv1.3",
+            "banner": "TLSv1.3 (CN: gateway.local)",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 2.1,
+          "evidence": {
+            "probe_type": "TLS_CERT_INSPECTION",
+            "observation": "TLS 1.3 Handshake completed. CN: gateway.local",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597884",
+            "metadata": {}
+          }
+        },
+        "53": {
+          "port": 53,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "DNS",
+            "product": "dnsmasq",
+            "version": "2.85",
+            "banner": "dnsmasq-2.85",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 1.2,
+          "evidence": {
+            "probe_type": "PORT_OBSERVATION",
+            "observation": "DNS TCP port listening",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597887",
+            "metadata": {}
+          }
+        }
+      },
+      "findings": [
+        {
+          "id": "FIND-192168-001",
+          "title": "Active Service Verification: HTTP",
+          "severity": "INFORMATIONAL",
+          "category": "SERVICE_EXPOSURE",
+          "host": "192.168.1.1",
+          "port": 80,
+          "service": "HTTP",
+          "description": "Standard network service HTTP verified operational on host 192.168.1.1 port 80. Latency: 1.9ms.",
+          "evidence": {
+            "probe_type": "HTTP_HEAD_PROBE",
+            "observation": "HTTP 200 OK | Server: lighttpd/1.4.59",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597875",
+            "metadata": {}
+          },
+          "impact": "Normal operational service exposure.",
+          "recommendation": "Maintain standard patch cycle and audit authorized access logs periodically.",
+          "cve_references": [],
+          "confidence": "HIGH"
+        },
+        {
+          "id": "FIND-192168-002",
+          "title": "Active Service Verification: HTTPS",
+          "severity": "INFORMATIONAL",
+          "category": "SERVICE_EXPOSURE",
+          "host": "192.168.1.1",
+          "port": 443,
+          "service": "HTTPS",
+          "description": "Standard network service HTTPS verified operational on host 192.168.1.1 port 443. Latency: 2.1ms.",
+          "evidence": {
+            "probe_type": "TLS_CERT_INSPECTION",
+            "observation": "TLS 1.3 Handshake completed. CN: gateway.local",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597884",
+            "metadata": {}
+          },
+          "impact": "Normal operational service exposure.",
+          "recommendation": "Maintain standard patch cycle and audit authorized access logs periodically.",
+          "cve_references": [],
+          "confidence": "HIGH"
+        },
+        {
+          "id": "FIND-192168-003",
+          "title": "Active Service Verification: DNS",
+          "severity": "INFORMATIONAL",
+          "category": "SERVICE_EXPOSURE",
+          "host": "192.168.1.1",
+          "port": 53,
+          "service": "DNS",
+          "description": "Standard network service DNS verified operational on host 192.168.1.1 port 53. Latency: 1.2ms.",
+          "evidence": {
+            "probe_type": "PORT_OBSERVATION",
+            "observation": "DNS TCP port listening",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597887",
+            "metadata": {}
+          },
+          "impact": "Normal operational service exposure.",
+          "recommendation": "Maintain standard patch cycle and audit authorized access logs periodically.",
+          "cve_references": [],
+          "confidence": "HIGH"
+        }
+      ],
+      "discovery_evidence": null
+    },
+    "192.168.1.10": {
+      "ip": "192.168.1.10",
+      "hostname": "app-prod.internal",
+      "status": "REACHABLE",
+      "os_hint": "",
+      "mac_address": "",
+      "vendor": "",
+      "latency_ms": 4.2,
+      "ports": {
+        "22": {
+          "port": 22,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "SSH",
+            "product": "OpenSSH",
+            "version": "8.9p1",
+            "banner": "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.6",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 4.1,
+          "evidence": {
+            "probe_type": "SSH_PROTOCOL_BANNER",
+            "observation": "SSH banner: SSH-2.0-OpenSSH_8.9p1",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597942",
+            "metadata": {}
+          }
+        },
+        "3306": {
+          "port": 3306,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "MySQL",
+            "product": "MySQL Server",
+            "version": "8.0.35",
+            "banner": "MySQL 8.0.35 Community",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 5.0,
+          "evidence": {
+            "probe_type": "MYSQL_HANDSHAKE",
+            "observation": "MySQL Initial Handshake parsed",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597946",
+            "metadata": {}
+          }
+        },
+        "6379": {
+          "port": 6379,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "Redis",
+            "product": "Redis Key-Value Store",
+            "version": "6.2.6",
+            "banner": "Redis RESP (+PONG)",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 3.8,
+          "evidence": {
+            "probe_type": "REDIS_COMMAND",
+            "observation": "Redis PING returned +PONG",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597948",
+            "metadata": {}
+          }
+        }
+      },
+      "findings": [
+        {
+          "id": "FIND-192168-001",
+          "title": "Potential Vulnerability: Terrapin Attack: SSH Channel Prefix Truncation (CVE-2023-48795)",
+          "severity": "MEDIUM",
+          "category": "OUTDATED_SOFTWARE",
+          "host": "192.168.1.10",
+          "port": 22,
+          "service": "SSH",
+          "description": "Observed Product: OpenSSH 8.9p1\nAdvisory Description: Vulnerability in SSH transport protocol allowing MITM attackers to truncate initial extension messages.\n[NOTE: Classified as POTENTIAL. Manual validation recommended to confirm exploitability in this environment.]",
+          "evidence": {
+            "probe_type": "VERSION_FINGERPRINT_CORRELATION",
+            "observation": "Banner matched product 'OpenSSH' and version string '8.9p1'. Advisory: CVE-2023-48795",
+            "raw_data": "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.6",
+            "confidence": "MEDIUM",
+            "timestamp": "2026-10-09T10:25:07.598030",
+            "metadata": {}
+          },
+          "impact": "If unpatched, this version may be vulnerable to Terrapin Attack: SSH Channel Prefix Truncation.",
+          "recommendation": "Upgrade OpenSSH to version 9.6p1 or newer, or disable ChaCha20-Poly1305 and CBC ciphers.",
+          "cve_references": [
+            "CVE-2023-48795"
+          ],
+          "confidence": "MEDIUM"
+        },
+        {
+          "id": "FIND-192168-002",
+          "title": "Potential Vulnerability: OpenSSH PKCS#11 Provider Remote Code Execution (CVE-2023-38408)",
+          "severity": "HIGH",
+          "category": "OUTDATED_SOFTWARE",
+          "host": "192.168.1.10",
+          "port": 22,
+          "service": "SSH",
+          "description": "Observed Product: OpenSSH 8.9p1\nAdvisory Description: Condition in ssh-agent forwarding allows arbitrary shared library loading via PKCS#11 providers.\n[NOTE: Classified as POTENTIAL. Manual validation recommended to confirm exploitability in this environment.]",
+          "evidence": {
+            "probe_type": "VERSION_FINGERPRINT_CORRELATION",
+            "observation": "Banner matched product 'OpenSSH' and version string '8.9p1'. Advisory: CVE-2023-38408",
+            "raw_data": "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.6",
+            "confidence": "MEDIUM",
+            "timestamp": "2026-10-09T10:25:07.598037",
+            "metadata": {}
+          },
+          "impact": "If unpatched, this version may be vulnerable to OpenSSH PKCS#11 Provider Remote Code Execution.",
+          "recommendation": "Update OpenSSH to 9.3p2 or disable remote agent forwarding.",
+          "cve_references": [
+            "CVE-2023-38408"
+          ],
+          "confidence": "MEDIUM"
+        },
+        {
+          "id": "FIND-192168-003",
+          "title": "Active Service Verification: SSH",
+          "severity": "INFORMATIONAL",
+          "category": "SERVICE_EXPOSURE",
+          "host": "192.168.1.10",
+          "port": 22,
+          "service": "SSH",
+          "description": "Standard network service SSH verified operational on host 192.168.1.10 port 22. Latency: 4.1ms.",
+          "evidence": {
+            "probe_type": "SSH_PROTOCOL_BANNER",
+            "observation": "SSH banner: SSH-2.0-OpenSSH_8.9p1",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597942",
+            "metadata": {}
+          },
+          "impact": "Normal operational service exposure.",
+          "recommendation": "Maintain standard patch cycle and audit authorized access logs periodically.",
+          "cve_references": [],
+          "confidence": "HIGH"
+        },
+        {
+          "id": "FIND-192168-004",
+          "title": "Direct Database Management Port Exposure (MYSQL)",
+          "severity": "MEDIUM",
+          "category": "DATABASE_EXPOSURE",
+          "host": "192.168.1.10",
+          "port": 3306,
+          "service": "MYSQL",
+          "description": "Database service MYSQL is listening on external network port 3306. Direct exposure increases risk of unauthorized queries and brute force.",
+          "evidence": {
+            "probe_type": "MYSQL_HANDSHAKE",
+            "observation": "MySQL Initial Handshake parsed",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597946",
+            "metadata": {}
+          },
+          "impact": "Potential exposure of sensitive records, denial of service, or unauthorized administrative actions if weak credentials exist.",
+          "recommendation": "Bind the MYSQL daemon strictly to localhost (127.0.0.1) or an internal private subnet; mandate VPN tunnels or application proxy access.",
+          "cve_references": [],
+          "confidence": "HIGH"
+        },
+        {
+          "id": "FIND-192168-005",
+          "title": "Direct Database Management Port Exposure (REDIS)",
+          "severity": "HIGH",
+          "category": "DATABASE_EXPOSURE",
+          "host": "192.168.1.10",
+          "port": 6379,
+          "service": "REDIS",
+          "description": "Database service REDIS is listening on external network port 6379. Direct exposure increases risk of unauthorized queries and brute force.",
+          "evidence": {
+            "probe_type": "REDIS_COMMAND",
+            "observation": "Redis PING returned +PONG",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.597948",
+            "metadata": {}
+          },
+          "impact": "Potential exposure of sensitive records, denial of service, or unauthorized administrative actions if weak credentials exist.",
+          "recommendation": "Bind the REDIS daemon strictly to localhost (127.0.0.1) or an internal private subnet; mandate VPN tunnels or application proxy access.",
+          "cve_references": [],
+          "confidence": "HIGH"
+        }
+      ],
+      "discovery_evidence": null
+    },
+    "192.168.1.15": {
+      "ip": "192.168.1.15",
+      "hostname": "lab-test.local",
+      "status": "REACHABLE",
+      "os_hint": "",
+      "mac_address": "",
+      "vendor": "",
+      "latency_ms": 6.1,
+      "ports": {
+        "21": {
+          "port": 21,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "FTP",
+            "product": "vsftpd",
+            "version": "3.0.3",
+            "banner": "220 (vsFTPd 3.0.3)",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 5.8,
+          "evidence": {
+            "probe_type": "FTP_GREETING",
+            "observation": "220 vsftpd 3.0.3 banner received",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.598059",
+            "metadata": {}
+          }
+        },
+        "23": {
+          "port": 23,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "Telnet",
+            "product": "Linux Telnetd",
+            "version": "",
+            "banner": "Debian GNU/Linux login:",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 6.3,
+          "evidence": {
+            "probe_type": "TCP_CONNECT",
+            "observation": "Telnet connection accepted without encryption",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.598064",
+            "metadata": {}
+          }
+        },
+        "3389": {
+          "port": 3389,
+          "protocol": "TCP",
+          "state": "OPEN",
+          "service": {
+            "name": "RDP",
+            "product": "Remote Desktop Protocol",
+            "version": "",
+            "banner": "MS RDP Listener",
+            "tunnel": "",
+            "evidence": null,
+            "confidence": "HIGH",
+            "cpe": ""
+          },
+          "latency_ms": 7.0,
+          "evidence": {
+            "probe_type": "PORT_OBSERVATION",
+            "observation": "RDP port open",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.598067",
+            "metadata": {}
+          }
+        }
+      },
+      "findings": [
+        {
+          "id": "FIND-192168-001",
+          "title": "Unencrypted FTP Protocol Exposure",
+          "severity": "MEDIUM",
+          "category": "UNENCRYPTED_COMMUNICATION",
+          "host": "192.168.1.15",
+          "port": 21,
+          "service": "FTP",
+          "description": "Standard FTP service detected on port 21. FTP transmits authentication credentials and transferred data without transport encryption.",
+          "evidence": {
+            "probe_type": "FTP_GREETING",
+            "observation": "220 vsftpd 3.0.3 banner received",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.598059",
+            "metadata": {}
+          },
+          "impact": "Sensitive files and credentials may be subject to packet sniffing and credential theft over unsegmented networks.",
+          "recommendation": "Replace legacy FTP with SFTP (SSH File Transfer Protocol) or require FTPS with explicit TLS enforcement.",
+          "cve_references": [],
+          "confidence": "HIGH"
+        },
+        {
+          "id": "FIND-192168-002",
+          "title": "Potential Vulnerability: vsftpd Denial of Service via Resource Exhaustion (CVE-2015-1849)",
+          "severity": "LOW",
+          "category": "OUTDATED_SOFTWARE",
+          "host": "192.168.1.15",
+          "port": 21,
+          "service": "FTP",
+          "description": "Observed Product: vsftpd 3.0.3\nAdvisory Description: Improper resource limits in specific non-standard configurations may lead to denial of service.\n[NOTE: Classified as POTENTIAL. Manual validation recommended to confirm exploitability in this environment.]",
+          "evidence": {
+            "probe_type": "VERSION_FINGERPRINT_CORRELATION",
+            "observation": "Banner matched product 'vsftpd' and version string '3.0.3'. Advisory: CVE-2015-1849",
+            "raw_data": "220 (vsFTPd 3.0.3)",
+            "confidence": "MEDIUM",
+            "timestamp": "2026-10-09T10:25:07.598079",
+            "metadata": {}
+          },
+          "impact": "If unpatched, this version may be vulnerable to vsftpd Denial of Service via Resource Exhaustion.",
+          "recommendation": "Upgrade vsftpd to 3.0.3 or implement strict per-IP connection limits.",
+          "cve_references": [
+            "CVE-2015-1849"
+          ],
+          "confidence": "MEDIUM"
+        },
+        {
+          "id": "FIND-192168-003",
+          "title": "Unencrypted Telnet Remote Administration Service Exposed",
+          "severity": "HIGH",
+          "category": "UNENCRYPTED_COMMUNICATION",
+          "host": "192.168.1.15",
+          "port": 23,
+          "service": "Telnet",
+          "description": "Port 23 accepts Telnet connections. The Telnet protocol transmits credentials, session tokens, and commands in cleartext.",
+          "evidence": {
+            "probe_type": "TCP_CONNECT",
+            "observation": "Telnet connection accepted without encryption",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.598064",
+            "metadata": {}
+          },
+          "impact": "Network eavesdroppers on the transit path can intercept administrative credentials and execute unauthorized commands.",
+          "recommendation": "Disable the Telnet daemon immediately and transition all remote access workflows to SSH (port 22).",
+          "cve_references": [],
+          "confidence": "HIGH"
+        },
+        {
+          "id": "FIND-192168-004",
+          "title": "Administrative Service Exposed (Remote Desktop (RDP))",
+          "severity": "MEDIUM",
+          "category": "ADMIN_INTERFACE",
+          "host": "192.168.1.15",
+          "port": 3389,
+          "service": "Remote Desktop (RDP)",
+          "description": "Administrative access interface Remote Desktop (RDP) detected listening on TCP/3389.",
+          "evidence": {
+            "probe_type": "PORT_OBSERVATION",
+            "observation": "RDP port open",
+            "raw_data": "",
+            "confidence": "HIGH",
+            "timestamp": "2026-10-09T10:25:07.598067",
+            "metadata": {}
+          },
+          "impact": "Exposed administration endpoints are frequent targets of brute-force password guessing and lateral movement attacks.",
+          "recommendation": "Enforce Network Level Authentication (NLA), place administration behind a dedicated VPN / bastion host, and restrict firewall access rules.",
+          "cve_references": [],
+          "confidence": "HIGH"
+        }
+      ],
+      "discovery_evidence": null
+    }
+  }
+}

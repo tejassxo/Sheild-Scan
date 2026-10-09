@@ -29,8 +29,8 @@ class FindingsView(QWidget):
         self._active_severity: Optional[str] = None
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(28, 24, 28, 24)
-        layout.setSpacing(16)
+        layout.setContentsMargins(32, 28, 32, 28)
+        layout.setSpacing(18)
 
         # Header
         self._title = QLabel("Findings & Security Intelligence")
@@ -61,6 +61,7 @@ class FindingsView(QWidget):
 
         for btn, sev in buttons:
             btn.setCheckable(True)
+            btn.setFixedHeight(34)
             self._btn_group.addButton(btn)
             btn.clicked.connect(lambda checked, s=sev: self._set_severity_filter(s))
             filter_row.addWidget(btn)
@@ -77,7 +78,19 @@ class FindingsView(QWidget):
         # Findings Table
         self._table = QTableWidget(0, 6)
         self._table.setHorizontalHeaderLabels(["Severity", "ID", "Title", "Target", "Category", "Confidence"])
-        self._table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        hdr = self._table.horizontalHeader()
+        hdr.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(2, QHeaderView.Stretch)
+        hdr.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(5, QHeaderView.ResizeToContents)
+        hdr.setHighlightSections(False)
+        self._table.verticalHeader().setVisible(False)
+        self._table.verticalHeader().setDefaultSectionSize(34)
+        self._table.setSelectionBehavior(QTableWidget.SelectRows)
+        self._table.setSelectionMode(QTableWidget.SingleSelection)
+        self._table.setAlternatingRowColors(True)
         self._table.cellDoubleClicked.connect(self._on_finding_double_clicked)
         layout.addWidget(self._table, stretch=1)
 
@@ -128,13 +141,29 @@ class FindingsView(QWidget):
             elif f.severity == FindingSeverity.INFORMATIONAL:
                 item_sev.setForeground(Qt.darkGreen)
 
-            self._table.setItem(row, 0, item_sev)
-            self._table.setItem(row, 1, QTableWidgetItem(f.id))
-            self._table.setItem(row, 2, QTableWidgetItem(f.title))
+            item_id = QTableWidgetItem(f.id)
+            item_title = QTableWidgetItem(f.title)
             target_str = f"{f.host}:{f.port}" if f.port else f.host
-            self._table.setItem(row, 3, QTableWidgetItem(target_str))
-            self._table.setItem(row, 4, QTableWidgetItem(f.category.value))
-            self._table.setItem(row, 5, QTableWidgetItem(f.confidence.value))
+            item_target = QTableWidgetItem(target_str)
+            cat_str = f.category.value.replace("_", " ").title()
+            item_cat = QTableWidgetItem(cat_str)
+            item_conf = QTableWidgetItem(f.confidence.value)
+
+            item_sev.setToolTip(f"Severity: {f.severity.value}")
+            item_id.setToolTip(f"Finding ID: {f.id}")
+            item_title.setToolTip(f"{f.title}\n\nDescription:\n{f.description}\n\nRemediation:\n{f.recommendation}")
+            item_target.setToolTip(f"Target: {target_str}")
+            item_cat.setToolTip(f"Category: {cat_str}")
+            item_conf.setToolTip(f"Confidence: {f.confidence.value}")
+
+            self._table.setItem(row, 0, item_sev)
+            self._table.setItem(row, 1, item_id)
+            self._table.setItem(row, 2, item_title)
+            self._table.setItem(row, 3, item_target)
+            self._table.setItem(row, 4, item_cat)
+            self._table.setItem(row, 5, item_conf)
+
+
 
     def _on_finding_double_clicked(self, row: int, col: int):
         query = self._search.text().strip().lower()

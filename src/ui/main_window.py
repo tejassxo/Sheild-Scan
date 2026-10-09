@@ -15,7 +15,7 @@ from src.storage.scan_store import ScanStore
 from src.ui.styles import SHIELDSCAN_QSS
 from src.ui.tokens import (
     C_CANVAS, C_SURFACE_PRIMARY, C_TEXT_PRIMARY, C_TEXT_SECONDARY,
-    C_TEXT_MUTED, C_ACCENT, C_BORDER
+    C_TEXT_MUTED, C_ACCENT, C_BORDER, C_POSITIVE
 )
 from src.ui.views.overview_view import OverviewView
 from src.ui.views.scan_view import ScanView
@@ -33,8 +33,10 @@ class MainWindow(QMainWindow):
     def __init__(self, store: Optional[ScanStore] = None):
         super().__init__()
         self.setWindowTitle("ShieldScan — Network Visibility & Security Assessment")
-        self.setMinimumSize(1240, 780)
+        self.setMinimumSize(1024, 660)
+        self.resize(1280, 800)
         self.setStyleSheet(SHIELDSCAN_QSS)
+
 
         self._store = store or ScanStore()
         self._current_scan: Optional[ScanResult] = None
@@ -52,16 +54,16 @@ class MainWindow(QMainWindow):
         # ── Left Navigation Sidebar ──────────────────────────────────────────
         sidebar = QFrame()
         sidebar.setObjectName("sidebar")
-        sidebar.setFixedWidth(220)
+        sidebar.setFixedWidth(235)
         sb_layout = QVBoxLayout(sidebar)
-        sb_layout.setContentsMargins(0, 20, 0, 20)
-        sb_layout.setSpacing(6)
+        sb_layout.setContentsMargins(0, 22, 0, 18)
+        sb_layout.setSpacing(4)
 
         # Brand / Identity
         brand_frame = QFrame()
         bf_layout = QVBoxLayout(brand_frame)
-        bf_layout.setContentsMargins(18, 0, 18, 16)
-        bf_layout.setSpacing(2)
+        bf_layout.setContentsMargins(20, 0, 20, 14)
+        bf_layout.setSpacing(3)
 
         lbl_logo = QLabel("SHIELDSCAN")
         lbl_logo.setObjectName("sidebar_logo")
@@ -71,32 +73,54 @@ class MainWindow(QMainWindow):
         bf_layout.addWidget(lbl_sub)
         sb_layout.addWidget(brand_frame)
 
-        # Navigation Items (Section 13)
-        nav_items = [
-            ("overview", "Overview"),
-            ("scans", "Assessments"),
-            ("hosts", "Hosts"),
-            ("services", "Services"),
-            ("findings", "Findings"),
-            ("compare", "Compare"),
-            ("reports", "Reports"),
-            ("settings", "Settings"),
+        # Categorized Navigation Items
+        nav_sections = [
+            ("WORKSPACE", [
+                ("overview", "Overview"),
+                ("scans", "Assessments"),
+            ]),
+            ("INTELLIGENCE", [
+                ("hosts", "Host Explorer"),
+                ("services", "Service Inventory"),
+                ("findings", "Findings Engine"),
+            ]),
+            ("DELIVERABLES & SYSTEM", [
+                ("compare", "Historical Compare"),
+                ("reports", "Report Center"),
+                ("settings", "Settings"),
+            ]),
         ]
 
-        for key, label in nav_items:
-            btn = QPushButton(label)
-            btn.setObjectName("nav_btn")
-            btn.setCheckable(True)
-            btn.clicked.connect(lambda checked, k=key: self._switch_view(k))
-            sb_layout.addWidget(btn)
-            self._nav_buttons[key] = btn
+        for section_title, items in nav_sections:
+            lbl_sec = QLabel(section_title)
+            lbl_sec.setObjectName("sidebar_section_hdr")
+            sb_layout.addWidget(lbl_sec)
+
+            for key, label in items:
+                btn = QPushButton(label)
+                btn.setObjectName("nav_btn")
+                btn.setCheckable(True)
+                btn.clicked.connect(lambda checked, k=key: self._switch_view(k))
+                sb_layout.addWidget(btn)
+                self._nav_buttons[key] = btn
 
         sb_layout.addStretch()
 
-        # Footer project label
-        lbl_footer = QLabel("ShieldScan v5.0\nDefensive Architecture")
-        lbl_footer.setStyleSheet(f"font-size: 10px; color: {C_TEXT_MUTED}; padding: 0 18px;")
-        sb_layout.addWidget(lbl_footer)
+        # Engine Telemetry Footer Box
+        footer_card = QFrame()
+        footer_card.setObjectName("card_secondary")
+        footer_card.setStyleSheet("margin: 0 14px; padding: 6px;")
+        fc_lo = QVBoxLayout(footer_card)
+        fc_lo.setContentsMargins(10, 8, 10, 8)
+        fc_lo.setSpacing(2)
+
+        lbl_fc_title = QLabel("ENGINE CORE v5.0")
+        lbl_fc_title.setStyleSheet(f"font-size: 9.5px; font-weight: 700; color: {C_TEXT_MUTED}; letter-spacing: 0.8px;")
+        lbl_fc_desc = QLabel("● Live Engine Ready\n● Non-Destructive Safe")
+        lbl_fc_desc.setStyleSheet(f"font-size: 10px; color: {C_POSITIVE}; font-weight: 600; line-height: 1.3;")
+        fc_lo.addWidget(lbl_fc_title)
+        fc_lo.addWidget(lbl_fc_desc)
+        sb_layout.addWidget(footer_card)
 
         root_layout.addWidget(sidebar)
 

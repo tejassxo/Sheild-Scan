@@ -27,8 +27,8 @@ class ServicesView(QWidget):
         self._all_services = []
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(28, 24, 28, 24)
-        layout.setSpacing(16)
+        layout.setContentsMargins(32, 28, 32, 28)
+        layout.setSpacing(18)
 
         # Header
         self._title = QLabel("Service Inventory")
@@ -46,7 +46,19 @@ class ServicesView(QWidget):
         # Services Table
         self._table = QTableWidget(0, 6)
         self._table.setHorizontalHeaderLabels(["Host", "Port / Proto", "Service", "Product", "Version", "Confidence"])
-        self._table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        hdr = self._table.horizontalHeader()
+        hdr.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(3, QHeaderView.Stretch)
+        hdr.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(5, QHeaderView.ResizeToContents)
+        hdr.setHighlightSections(False)
+        self._table.verticalHeader().setVisible(False)
+        self._table.verticalHeader().setDefaultSectionSize(34)
+        self._table.setSelectionBehavior(QTableWidget.SelectRows)
+        self._table.setSelectionMode(QTableWidget.SingleSelection)
+        self._table.setAlternatingRowColors(True)
         self._table.cellDoubleClicked.connect(self._on_service_double_clicked)
         layout.addWidget(self._table, stretch=1)
 
@@ -60,12 +72,30 @@ class ServicesView(QWidget):
         for s in services_list:
             row = self._table.rowCount()
             self._table.insertRow(row)
-            self._table.setItem(row, 0, QTableWidgetItem(s["host"]))
-            self._table.setItem(row, 1, QTableWidgetItem(f"{s['port']}/{s['protocol']}"))
-            self._table.setItem(row, 2, QTableWidgetItem(s["name"]))
-            self._table.setItem(row, 3, QTableWidgetItem(s["product"] or "—"))
-            self._table.setItem(row, 4, QTableWidgetItem(s["version"] or "—"))
-            self._table.setItem(row, 5, QTableWidgetItem(s["confidence"]))
+
+            it_host = QTableWidgetItem(s["host"])
+            it_port = QTableWidgetItem(f"{s['port']}/{s['protocol']}")
+            it_name = QTableWidgetItem(s["name"])
+            prod_str = s["product"] or "—"
+            it_prod = QTableWidgetItem(prod_str)
+            ver_str = s["version"] or "—"
+            it_ver = QTableWidgetItem(ver_str)
+            it_conf = QTableWidgetItem(s["confidence"])
+
+            it_host.setToolTip(f"Host: {s['host']}")
+            it_port.setToolTip(f"Port: {s['port']}/{s['protocol']}")
+            it_name.setToolTip(f"Service: {s['name']}")
+            it_prod.setToolTip(f"Product: {prod_str}\nBanner: {s.get('banner', '')}")
+            it_ver.setToolTip(f"Version: {ver_str}")
+            it_conf.setToolTip(f"Identification Confidence: {s['confidence']}")
+
+            self._table.setItem(row, 0, it_host)
+            self._table.setItem(row, 1, it_port)
+            self._table.setItem(row, 2, it_name)
+            self._table.setItem(row, 3, it_prod)
+            self._table.setItem(row, 4, it_ver)
+            self._table.setItem(row, 5, it_conf)
+
 
     def _filter_table(self, query: str):
         q = query.strip().lower()

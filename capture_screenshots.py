@@ -7,8 +7,6 @@ import os
 import sys
 from pathlib import Path
 
-# Set Qt offscreen platform before creating QApplication
-os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QSize
@@ -105,14 +103,12 @@ def capture_all_views(output_dir: Path):
     demo_scan = create_demo_assessment()
     store.save(demo_scan)
 
+    # 1. Capture Standard 1280x800
     win = MainWindow(store=store)
     win.resize(QSize(1280, 800))
     win.show()
-
-    # Load demo scan into all views
     win._propagate_scan(demo_scan)
 
-    # List of views to capture
     views = [
         ("overview", "01_dashboard_overview.png"),
         ("scans", "02_scan_controller.png"),
@@ -121,6 +117,7 @@ def capture_all_views(output_dir: Path):
         ("findings", "05_findings_workspace.png"),
         ("compare", "06_historical_comparison.png"),
         ("reports", "07_report_center.png"),
+        ("settings", "08_settings_view.png"),
     ]
 
     for key, filename in views:
@@ -129,11 +126,24 @@ def capture_all_views(output_dir: Path):
         pixmap = win.grab()
         save_path = output_dir / filename
         pixmap.save(str(save_path), "PNG")
-        print(f"[+] Screenshot captured: {save_path}")
+        print(f"[+] Standard 1280x800 screenshot: {save_path.name}")
+
+    # 2. Capture Maximized 1920x1080
+    win.resize(QSize(1920, 1080))
+    app.processEvents()
+    for key, filename in views:
+        win._switch_view(key)
+        app.processEvents()
+        pixmap = win.grab()
+        max_filename = filename.replace(".png", "_1080p.png")
+        save_path = output_dir / max_filename
+        pixmap.save(str(save_path), "PNG")
+        print(f"[+] Full HD 1920x1080 screenshot: {save_path.name}")
 
     print("[*] All UI screenshots successfully generated.")
 
 
 if __name__ == "__main__":
-    out_dir = Path("C:/Users/tejas/.gemini/antigravity-ide/scratch/ShieldScan/screenshots")
+    out_dir = Path(__file__).resolve().parent / "screenshots"
     capture_all_views(out_dir)
+

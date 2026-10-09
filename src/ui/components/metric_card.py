@@ -14,24 +14,24 @@ class MetricCard(QFrame):
     def __init__(self, label: str, value: str = "0", context: str = "", parent: QWidget = None, is_accent: bool = False):
         super().__init__(parent)
         self.setObjectName("card")
-        self.setMinimumHeight(86)
+        self.setMinimumHeight(104)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(16, 14, 16, 14)
-        layout.setSpacing(2)
+        layout.setContentsMargins(20, 16, 20, 16)
+        layout.setSpacing(4)
 
         self._lbl_label = QLabel(label.upper())
-        self._lbl_label.setStyleSheet(f"font-size: 10px; font-weight: 700; color: {C_TEXT_MUTED}; letter-spacing: 0.8px;")
+        self._lbl_label.setStyleSheet(f"font-size: 10.5px; font-weight: 700; color: {C_TEXT_MUTED}; letter-spacing: 0.8px;")
         layout.addWidget(self._lbl_label)
 
         self._lbl_value = QLabel(value)
         val_color = C_ACCENT if is_accent else C_TEXT_PRIMARY
-        self._lbl_value.setStyleSheet(f"font-size: 26px; font-weight: 700; color: {val_color};")
+        self._lbl_value.setStyleSheet(f"font-size: 32px; font-weight: 700; color: {val_color}; line-height: 1.1;")
         layout.addWidget(self._lbl_value)
 
         if context:
             self._lbl_ctx = QLabel(context)
-            self._lbl_ctx.setStyleSheet(f"font-size: 10px; color: {C_TEXT_SECONDARY};")
+            self._lbl_ctx.setStyleSheet(f"font-size: 11px; font-weight: 500; color: {C_TEXT_SECONDARY};")
             layout.addWidget(self._lbl_ctx)
         else:
             self._lbl_ctx = None
@@ -42,3 +42,7 @@ class MetricCard(QFrame):
     def set_context(self, context: str):
         if self._lbl_ctx:
             self._lbl_ctx.setText(context)
+        else:
+            self._lbl_ctx = QLabel(context)
+            self._lbl_ctx.setStyleSheet(f"font-size: 11px; font-weight: 500; color: {C_TEXT_SECONDARY};")
+            self.layout().addWidget(self._lbl_ctx)

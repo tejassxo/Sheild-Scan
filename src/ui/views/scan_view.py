@@ -12,8 +12,9 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
     QComboBox, QPushButton, QFrame, QProgressBar, QSpinBox,
     QCheckBox, QTableWidget, QTableWidgetItem, QHeaderView,
-    QMessageBox
+    QMessageBox, QScrollArea
 )
+
 from src.models.assessment import ScanResult
 from src.models.scan_profile import (
     BUILTIN_PROFILES, ScanProfile, ScanTechnique, parse_port_range
@@ -67,9 +68,14 @@ class ScanView(QWidget):
         self._t_start: float = 0.0
         self._discovered_open_ports: list[tuple[str, PortRecord]] = []
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(28, 24, 28, 24)
-        layout.setSpacing(16)
+        scroll = QScrollArea(self)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+
+        content = QWidget()
+        layout = QVBoxLayout(content)
+        layout.setContentsMargins(32, 28, 32, 28)
+        layout.setSpacing(18)
 
         # ── Title ────────────────────────────────────────────────────────────
         self._title = QLabel("Network Assessment Controller")
@@ -83,7 +89,7 @@ class ScanView(QWidget):
         self._card_config = QFrame()
         self._card_config.setObjectName("card")
         cfg_lo = QVBoxLayout(self._card_config)
-        cfg_lo.setContentsMargins(20, 16, 20, 16)
+        cfg_lo.setContentsMargins(22, 18, 22, 18)
         cfg_lo.setSpacing(12)
 
         # Row 1: Target Scope and Scan Technique
@@ -185,25 +191,25 @@ class ScanView(QWidget):
 
         self._btn_launch = QPushButton("Start Assessment →")
         self._btn_launch.setObjectName("btn_primary")
-        self._btn_launch.setFixedHeight(34)
+        self._btn_launch.setFixedHeight(36)
         self._btn_launch.clicked.connect(self.start_scan)
         btn_lo.addWidget(self._btn_launch)
 
         self._btn_pause = QPushButton("⏸  Pause")
-        self._btn_pause.setFixedHeight(34)
+        self._btn_pause.setFixedHeight(36)
         self._btn_pause.setEnabled(False)
         self._btn_pause.clicked.connect(self.toggle_pause)
         btn_lo.addWidget(self._btn_pause)
 
         self._btn_stop = QPushButton("Stop Scan")
         self._btn_stop.setObjectName("btn_stop")
-        self._btn_stop.setFixedHeight(34)
+        self._btn_stop.setFixedHeight(36)
         self._btn_stop.setEnabled(False)
         self._btn_stop.clicked.connect(self.stop_scan)
         btn_lo.addWidget(self._btn_stop)
 
         self._btn_clear = QPushButton("Clear")
-        self._btn_clear.setFixedHeight(34)
+        self._btn_clear.setFixedHeight(36)
         self._btn_clear.clicked.connect(self.clear_results)
         btn_lo.addWidget(self._btn_clear)
 
@@ -215,7 +221,7 @@ class ScanView(QWidget):
         self._card_live = QFrame()
         self._card_live.setObjectName("card")
         live_lo = QVBoxLayout(self._card_live)
-        live_lo.setContentsMargins(20, 16, 20, 16)
+        live_lo.setContentsMargins(22, 18, 22, 18)
         live_lo.setSpacing(10)
 
         live_hdr = QHBoxLayout()
@@ -244,21 +250,38 @@ class ScanView(QWidget):
 
         # Live Verified Open Ports Table (Streams only open ports for maximum UI smoothness)
         lbl_tbl = QLabel("OPEN PORTS VERIFIED (Double-click any entry for raw evidence trace)")
-        lbl_tbl.setStyleSheet(f"font-size: 10px; font-weight: 700; color: {C_TEXT_MUTED}; letter-spacing: 0.8px;")
+        lbl_tbl.setStyleSheet(f"font-size: 10.5px; font-weight: 700; color: {C_TEXT_MUTED}; letter-spacing: 0.8px;")
         live_lo.addWidget(lbl_tbl)
 
         self._table_live = QTableWidget(0, 5)
         self._table_live.setHorizontalHeaderLabels(["Host", "Port / Protocol", "State", "Service / Product", "Latency"])
-        self._table_live.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        hdr = self._table_live.horizontalHeader()
+        hdr.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(3, QHeaderView.Stretch)
+        hdr.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        hdr.setHighlightSections(False)
+        self._table_live.verticalHeader().setVisible(False)
+        self._table_live.verticalHeader().setDefaultSectionSize(32)
+        self._table_live.setSelectionBehavior(QTableWidget.SelectRows)
+        self._table_live.setSelectionMode(QTableWidget.SingleSelection)
+        self._table_live.setAlternatingRowColors(True)
         self._table_live.cellDoubleClicked.connect(self._on_row_double_clicked)
-        self._table_live.setMinimumHeight(200)
+        self._table_live.setMinimumHeight(280)
         live_lo.addWidget(self._table_live)
 
-        layout.addWidget(self._card_live, stretch=1)
+        layout.addWidget(self._card_live)
+
+        scroll.setWidget(content)
+        root_lo = QVBoxLayout(self)
+        root_lo.setContentsMargins(0, 0, 0, 0)
+        root_lo.addWidget(scroll)
 
         # Timer for elapsed time
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._tick_timer)
+
 
     def _on_profile_changed(self, idx: int):
         if idx < len(BUILTIN_PROFILES):
@@ -410,16 +433,26 @@ class ScanView(QWidget):
             if p_rec.service and p_rec.service.product:
                 svc_name += f" ({p_rec.service.product})"
 
-            self._table_live.setItem(row, 0, QTableWidgetItem(host_ip))
-            self._table_live.setItem(row, 1, QTableWidgetItem(f"{p_rec.port}/{p_rec.protocol.value}"))
+            it_host = QTableWidgetItem(host_ip)
+            it_port = QTableWidgetItem(f"{p_rec.port}/{p_rec.protocol.value}")
+            it_state = QTableWidgetItem(p_rec.state.value)
+            it_state.setForeground(Qt.darkGreen)
+            it_svc = QTableWidgetItem(svc_name)
+            it_lat = QTableWidgetItem(f"{p_rec.latency_ms:.1f} ms")
 
-            st_item = QTableWidgetItem(p_rec.state.value)
-            st_item.setForeground(Qt.darkGreen)
-            self._table_live.setItem(row, 2, st_item)
+            it_host.setToolTip(f"Host IP: {host_ip}")
+            it_port.setToolTip(f"Port: {p_rec.port}/{p_rec.protocol.value}")
+            it_state.setToolTip(f"State: {p_rec.state.value}")
+            it_svc.setToolTip(f"Service: {svc_name}")
+            it_lat.setToolTip(f"Latency: {p_rec.latency_ms:.1f} ms")
 
-            self._table_live.setItem(row, 3, QTableWidgetItem(svc_name))
-            self._table_live.setItem(row, 4, QTableWidgetItem(f"{p_rec.latency_ms:.1f} ms"))
+            self._table_live.setItem(row, 0, it_host)
+            self._table_live.setItem(row, 1, it_port)
+            self._table_live.setItem(row, 2, it_state)
+            self._table_live.setItem(row, 3, it_svc)
+            self._table_live.setItem(row, 4, it_lat)
             self._table_live.scrollToBottom()
+
 
     def _on_finished(self, scan_result: ScanResult):
         self._timer.stop()

@@ -30,8 +30,8 @@ class ComparisonView(QWidget):
         self._all_scans: List[ScanResult] = []
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(28, 24, 28, 24)
-        layout.setSpacing(16)
+        layout.setContentsMargins(32, 28, 32, 28)
+        layout.setSpacing(18)
 
         # Header
         self._title = QLabel("Historical Scan Comparison")
@@ -45,7 +45,7 @@ class ComparisonView(QWidget):
         sel_card = QFrame()
         sel_card.setObjectName("card")
         sel_lo = QHBoxLayout(sel_card)
-        sel_lo.setContentsMargins(16, 14, 16, 14)
+        sel_lo.setContentsMargins(20, 16, 20, 16)
         sel_lo.setSpacing(14)
 
         sel_lo.addWidget(QLabel("Baseline Scan:"))
@@ -58,6 +58,7 @@ class ComparisonView(QWidget):
 
         self._btn_compare = QPushButton("Compare Scans →")
         self._btn_compare.setObjectName("btn_primary")
+        self._btn_compare.setFixedHeight(34)
         self._btn_compare.clicked.connect(self._run_comparison)
         sel_lo.addWidget(self._btn_compare)
 
@@ -65,7 +66,7 @@ class ComparisonView(QWidget):
 
         # Delta Metric Cards
         delta_grid = QGridLayout()
-        delta_grid.setSpacing(12)
+        delta_grid.setSpacing(16)
 
         self._m_hosts_delta = MetricCard("Net Host Change", "0", "0 new / 0 removed")
         self._m_ports_delta = MetricCard("New Open Ports", "0", "0 closed")
@@ -80,12 +81,23 @@ class ComparisonView(QWidget):
 
         # Detailed Delta Table
         lbl_tbl = QLabel("DETAILED NETWORK DRIFT LOG")
-        lbl_tbl.setStyleSheet(f"font-size: 10px; font-weight: 700; color: {C_TEXT_MUTED}; letter-spacing: 0.8px;")
+        lbl_tbl.setStyleSheet(f"font-size: 10.5px; font-weight: 700; color: {C_TEXT_MUTED}; letter-spacing: 0.8px;")
         layout.addWidget(lbl_tbl)
 
         self._table = QTableWidget(0, 4)
         self._table.setHorizontalHeaderLabels(["Change Category", "Target / Host", "Observed Difference", "Status"])
-        self._table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        hdr = self._table.horizontalHeader()
+        hdr.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(2, QHeaderView.Stretch)
+        hdr.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        hdr.setHighlightSections(False)
+        self._table.verticalHeader().setVisible(False)
+        self._table.verticalHeader().setDefaultSectionSize(34)
+        self._table.setSelectionBehavior(QTableWidget.SelectRows)
+        self._table.setSelectionMode(QTableWidget.SingleSelection)
+        self._table.setAlternatingRowColors(True)
+        self._table.setMinimumHeight(200)
         layout.addWidget(self._table, stretch=1)
 
     def refresh_scans(self):
@@ -140,79 +152,49 @@ class ComparisonView(QWidget):
         # Populate Delta Table
         self._table.setRowCount(0)
 
-        # New Hosts
-        for nh in comp.new_hosts:
+        def add_row(cat, target, diff, st_text, fg_color=None):
             r = self._table.rowCount()
             self._table.insertRow(r)
-            self._table.setItem(r, 0, QTableWidgetItem("HOST ADDED"))
-            self._table.setItem(r, 1, QTableWidgetItem(nh))
-            self._table.setItem(r, 2, QTableWidgetItem("Host newly discovered active in network scope"))
-            it_st = QTableWidgetItem("+ NEW")
-            it_st.setForeground(Qt.darkGreen)
-            self._table.setItem(r, 3, it_st)
+            it0 = QTableWidgetItem(cat)
+            it1 = QTableWidgetItem(target)
+            it2 = QTableWidgetItem(diff)
+            it3 = QTableWidgetItem(st_text)
+            if fg_color:
+                it3.setForeground(fg_color)
+            it0.setToolTip(cat)
+            it1.setToolTip(target)
+            it2.setToolTip(diff)
+            it3.setToolTip(st_text)
+            self._table.setItem(r, 0, it0)
+            self._table.setItem(r, 1, it1)
+            self._table.setItem(r, 2, it2)
+            self._table.setItem(r, 3, it3)
+
+        # New Hosts
+        for nh in comp.new_hosts:
+            add_row("HOST ADDED", nh, "Host newly discovered active in network scope", "+ NEW", Qt.darkGreen)
 
         # Removed Hosts
         for rh in comp.removed_hosts:
-            r = self._table.rowCount()
-            self._table.insertRow(r)
-            self._table.setItem(r, 0, QTableWidgetItem("HOST REMOVED"))
-            self._table.setItem(r, 1, QTableWidgetItem(rh))
-            self._table.setItem(r, 2, QTableWidgetItem("Host no longer responsive to discovery probes"))
-            it_st = QTableWidgetItem("- REMOVED")
-            it_st.setForeground(Qt.red)
-            self._table.setItem(r, 3, it_st)
+            add_row("HOST REMOVED", rh, "Host no longer responsive to discovery probes", "- REMOVED", Qt.red)
 
         # New Open Ports
         for np in comp.new_open_ports:
-            r = self._table.rowCount()
-            self._table.insertRow(r)
-            self._table.setItem(r, 0, QTableWidgetItem("PORT OPENED"))
-            self._table.setItem(r, 1, QTableWidgetItem(f"{np.host}:{np.port}/{np.protocol}"))
-            self._table.setItem(r, 2, QTableWidgetItem(f"Port now listening ({np.service})"))
-            it_st = QTableWidgetItem("+ OPEN")
-            it_st.setForeground(Qt.darkGreen)
-            self._table.setItem(r, 3, it_st)
+            add_row("PORT OPENED", f"{np.host}:{np.port}/{np.protocol}", f"Port now listening ({np.service})", "+ OPEN", Qt.darkGreen)
 
         # Closed Ports
         for cp in comp.closed_ports:
-            r = self._table.rowCount()
-            self._table.insertRow(r)
-            self._table.setItem(r, 0, QTableWidgetItem("PORT CLOSED"))
-            self._table.setItem(r, 1, QTableWidgetItem(f"{cp.host}:{cp.port}/{cp.protocol}"))
-            self._table.setItem(r, 2, QTableWidgetItem(f"Previously listening port now closed"))
-            it_st = QTableWidgetItem("- CLOSED")
-            it_st.setForeground(Qt.darkGray)
-            self._table.setItem(r, 3, it_st)
+            add_row("PORT CLOSED", f"{cp.host}:{cp.port}/{cp.protocol}", "Previously listening port now closed", "- CLOSED", Qt.darkGray)
 
         # Service Changes
         for sc in comp.service_changes:
-            r = self._table.rowCount()
-            self._table.insertRow(r)
-            self._table.setItem(r, 0, QTableWidgetItem("SERVICE CHANGED"))
-            self._table.setItem(r, 1, QTableWidgetItem(f"{sc.host}:{sc.port}"))
-            self._table.setItem(r, 2, QTableWidgetItem(f"Migrated from '{sc.old_service}' to '{sc.new_service}'"))
-            it_st = QTableWidgetItem("MODIFIED")
-            it_st.setForeground(Qt.darkYellow)
-            self._table.setItem(r, 3, it_st)
+            add_row("SERVICE CHANGED", f"{sc.host}:{sc.port}", f"Migrated from '{sc.old_service}' to '{sc.new_service}'", "MODIFIED", Qt.darkYellow)
 
         # New Findings
         for nf in comp.new_findings:
-            r = self._table.rowCount()
-            self._table.insertRow(r)
-            self._table.setItem(r, 0, QTableWidgetItem(f"FINDING ({nf.severity})"))
-            self._table.setItem(r, 1, QTableWidgetItem(nf.host))
-            self._table.setItem(r, 2, QTableWidgetItem(f"[{nf.finding_id}] {nf.title}"))
-            it_st = QTableWidgetItem("+ NEW RISK")
-            it_st.setForeground(Qt.red)
-            self._table.setItem(r, 3, it_st)
+            add_row(f"FINDING ({nf.severity})", nf.host, f"[{nf.finding_id}] {nf.title}", "+ NEW RISK", Qt.red)
 
         # Resolved Findings
         for rf in comp.resolved_findings:
-            r = self._table.rowCount()
-            self._table.insertRow(r)
-            self._table.setItem(r, 0, QTableWidgetItem(f"FINDING RESOLVED ({rf.severity})"))
-            self._table.setItem(r, 1, QTableWidgetItem(rf.host))
-            self._table.setItem(r, 2, QTableWidgetItem(f"[{rf.finding_id}] {rf.title}"))
-            it_st = QTableWidgetItem("✓ RESOLVED")
-            it_st.setForeground(Qt.darkGreen)
-            self._table.setItem(r, 3, it_st)
+            add_row(f"FINDING RESOLVED ({rf.severity})", rf.host, f"[{rf.finding_id}] {rf.title}", "✓ RESOLVED", Qt.darkGreen)
+

@@ -226,3 +226,4 @@ ShieldScan is engineered strictly for authorized security assessments, defensive
 1. **Heuristic OS Fingerprinting**: TCP/IP stack window size and TTL analysis.
 2. **Interactive Topology Visualization**: Dynamic force-directed network map of discovered subnets.
 3. **Continuous Monitoring Daemon**: Background agent alerting on real-time network port drift.
+  

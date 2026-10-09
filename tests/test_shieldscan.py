@@ -127,8 +127,9 @@ class TestShieldScan(unittest.TestCase):
         self.assertEqual(diff.new_open_ports[0].port, 443)
 
     def test_docx_and_pptx_generation(self):
-        test_dir = Path("C:/Users/tejas/.gemini/antigravity-ide/scratch/ShieldScan/reports/generated")
+        test_dir = Path(__file__).resolve().parents[1] / "reports" / "generated"
         test_dir.mkdir(parents=True, exist_ok=True)
+
 
         res = ScanResult(id="test_scan", target="127.0.0.1", duration_seconds=1.25)
         h = HostRecord(ip="127.0.0.1", hostname="localhost", status=HostStatus.REACHABLE)

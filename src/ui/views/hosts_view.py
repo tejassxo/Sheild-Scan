@@ -16,8 +16,9 @@ from src.ui.components.badges import StatusBadge
 from src.ui.components.detail_drawer import DetailDrawer
 from src.ui.tokens import (
     C_TEXT_PRIMARY, C_TEXT_SECONDARY, C_TEXT_MUTED, C_ACCENT,
-    C_POSITIVE, C_BORDER, FONT_FAMILY_MONO
+    C_POSITIVE, C_BORDER, FONT_FAMILY_PRIMARY, FONT_FAMILY_MONO
 )
+
 
 
 class HostsView(QWidget):
@@ -29,8 +30,8 @@ class HostsView(QWidget):
         self._selected_host: Optional[HostRecord] = None
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(28, 24, 28, 24)
-        layout.setSpacing(16)
+        layout.setContentsMargins(32, 28, 32, 28)
+        layout.setSpacing(18)
 
         # Header
         self._title = QLabel("Host Explorer")
@@ -42,11 +43,13 @@ class HostsView(QWidget):
 
         # Splitter (Left: Host List, Right: Host Details)
         splitter = QSplitter(Qt.Horizontal)
-        splitter.setHandleWidth(1)
+        splitter.setChildrenCollapsible(False)
+        splitter.setHandleWidth(2)
 
         # Left Panel (Host List)
         left_panel = QFrame()
         left_panel.setObjectName("card")
+        left_panel.setMinimumWidth(240)
         l_lo = QVBoxLayout(left_panel)
         l_lo.setContentsMargins(14, 14, 14, 14)
         l_lo.setSpacing(8)
@@ -56,18 +59,21 @@ class HostsView(QWidget):
         l_lo.addWidget(lbl_hl)
 
         self._host_list = QListWidget()
-        self._host_list.setStyleSheet(f"font-family: {FONT_FAMILY_MONO}; font-size: 12px; border: none;")
+        self._host_list.setStyleSheet(f"font-family: {FONT_FAMILY_PRIMARY}; font-size: 12px; font-weight: 500; border: none;")
+        self._host_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._host_list.currentItemChanged.connect(self._on_host_selected)
         l_lo.addWidget(self._host_list)
+
 
         splitter.addWidget(left_panel)
 
         # Right Panel (Host Details)
         right_panel = QFrame()
         right_panel.setObjectName("card")
+        right_panel.setMinimumWidth(440)
         r_lo = QVBoxLayout(right_panel)
         r_lo.setContentsMargins(20, 18, 20, 18)
-        r_lo.setSpacing(14)
+        r_lo.setSpacing(12)
 
         # Host Identity Banner
         self._lbl_host_ip = QLabel("Select a host system")
@@ -84,9 +90,17 @@ class HostsView(QWidget):
 
         self._ports_table = QTableWidget(0, 5)
         self._ports_table.setHorizontalHeaderLabels(["Port", "State", "Service", "Product / Version", "Evidence"])
-        self._ports_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        p_hdr = self._ports_table.horizontalHeader()
+        p_hdr.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        p_hdr.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        p_hdr.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        p_hdr.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        p_hdr.setSectionResizeMode(4, QHeaderView.Stretch)
+        p_hdr.setHighlightSections(False)
+        self._ports_table.verticalHeader().setDefaultSectionSize(32)
+        self._ports_table.setMinimumHeight(180)
         self._ports_table.cellDoubleClicked.connect(self._on_port_double_clicked)
-        r_lo.addWidget(self._ports_table, stretch=1)
+        r_lo.addWidget(self._ports_table, stretch=3)
 
         # Findings Summary for Host
         lbl_ft = QLabel("SECURITY FINDINGS FOR THIS HOST")
@@ -95,12 +109,22 @@ class HostsView(QWidget):
 
         self._findings_table = QTableWidget(0, 4)
         self._findings_table.setHorizontalHeaderLabels(["Severity", "ID", "Title", "Port"])
-        self._findings_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self._findings_table.setMinimumHeight(120)
-        r_lo.addWidget(self._findings_table)
+        f_hdr = self._findings_table.horizontalHeader()
+        f_hdr.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        f_hdr.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        f_hdr.setSectionResizeMode(2, QHeaderView.Stretch)
+        f_hdr.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        f_hdr.setHighlightSections(False)
+        self._findings_table.verticalHeader().setVisible(False)
+        self._findings_table.verticalHeader().setDefaultSectionSize(32)
+        self._findings_table.setSelectionBehavior(QTableWidget.SelectRows)
+        self._findings_table.setSelectionMode(QTableWidget.SingleSelection)
+        self._findings_table.setAlternatingRowColors(True)
+        self._findings_table.setMinimumHeight(150)
+        r_lo.addWidget(self._findings_table, stretch=2)
 
         splitter.addWidget(right_panel)
-        splitter.setSizes([260, 680])
+        splitter.setSizes([280, 780])
         layout.addWidget(splitter, stretch=1)
 
     def load_scan(self, scan_result: ScanResult):
@@ -115,6 +139,7 @@ class HostsView(QWidget):
                 label += f" ({host.hostname})"
             item = QListWidgetItem(label)
             item.setData(Qt.UserRole, ip)
+            item.setToolTip(f"{ip} - {host.status.value} ({len(host.open_ports)} ports)")
             self._host_list.addItem(item)
 
         if self._host_list.count() > 0:
@@ -141,24 +166,57 @@ class HostsView(QWidget):
         for p in host.open_ports:
             row = self._ports_table.rowCount()
             self._ports_table.insertRow(row)
-            self._ports_table.setItem(row, 0, QTableWidgetItem(f"{p.port}/{p.protocol.value}"))
-            self._ports_table.setItem(row, 1, QTableWidgetItem(p.state.value))
+
+            it_port = QTableWidgetItem(f"{p.port}/{p.protocol.value}")
+            it_state = QTableWidgetItem(p.state.value)
             svc_name = p.service.name if p.service else "Unknown"
-            self._ports_table.setItem(row, 2, QTableWidgetItem(svc_name))
+            it_svc = QTableWidgetItem(svc_name)
             prod_ver = f"{p.service.product} {p.service.version}".strip() if p.service else "—"
-            self._ports_table.setItem(row, 3, QTableWidgetItem(prod_ver or "—"))
+            it_prod = QTableWidgetItem(prod_ver or "—")
             ev_str = p.evidence.observation if p.evidence else "TCP Connection"
-            self._ports_table.setItem(row, 4, QTableWidgetItem(ev_str[:60]))
+            it_ev = QTableWidgetItem(ev_str)
+
+            # Tooltips to guarantee full visibility
+            it_port.setToolTip(f"Port {p.port}/{p.protocol.value}")
+            it_state.setToolTip(f"State: {p.state.value}")
+            it_svc.setToolTip(f"Service: {svc_name}")
+            it_prod.setToolTip(f"Product & Version: {prod_ver or '—'}")
+            it_ev.setToolTip(ev_str)
+
+            self._ports_table.setItem(row, 0, it_port)
+            self._ports_table.setItem(row, 1, it_state)
+            self._ports_table.setItem(row, 2, it_svc)
+            self._ports_table.setItem(row, 3, it_prod)
+            self._ports_table.setItem(row, 4, it_ev)
 
         # Populate Findings
         self._findings_table.setRowCount(0)
         for f in host.findings:
             row = self._findings_table.rowCount()
             self._findings_table.insertRow(row)
-            self._findings_table.setItem(row, 0, QTableWidgetItem(f.severity.value))
-            self._findings_table.setItem(row, 1, QTableWidgetItem(f.id))
-            self._findings_table.setItem(row, 2, QTableWidgetItem(f.title))
-            self._findings_table.setItem(row, 3, QTableWidgetItem(str(f.port) if f.port else "Host"))
+
+            it_sev = QTableWidgetItem(f.severity.value)
+            if f.severity.value == "HIGH":
+                it_sev.setForeground(Qt.red)
+            elif f.severity.value == "MEDIUM":
+                it_sev.setForeground(Qt.darkYellow)
+            elif f.severity.value == "INFORMATIONAL":
+                it_sev.setForeground(Qt.darkGreen)
+
+            it_id = QTableWidgetItem(f.id)
+            it_title = QTableWidgetItem(f.title)
+            it_port = QTableWidgetItem(str(f.port) if f.port else "Host")
+
+            it_sev.setToolTip(f"Severity: {f.severity.value}")
+            it_id.setToolTip(f"Finding ID: {f.id}")
+            it_title.setToolTip(f"{f.title}\n{f.description}")
+            it_port.setToolTip(f"Target Port: {f.port if f.port else 'Host-wide'}")
+
+            self._findings_table.setItem(row, 0, it_sev)
+            self._findings_table.setItem(row, 1, it_id)
+            self._findings_table.setItem(row, 2, it_title)
+            self._findings_table.setItem(row, 3, it_port)
+
 
     def _on_port_double_clicked(self, row: int, col: int):
         if not self._selected_host:

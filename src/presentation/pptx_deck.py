@@ -245,8 +245,10 @@ def generate_presentation(scan_result: ScanResult, output_path: Path, screenshot
         pm3.font.color.rgb = C_MUTED
 
     # Check if dashboard screenshot exists
-    dash_ss = screenshots_dir / "01_dashboard_overview.png" if screenshots_dir else Path("C:/Users/tejas/.gemini/antigravity-ide/scratch/ShieldScan/screenshots/01_dashboard_overview.png")
+    default_ss_dir = Path(__file__).resolve().parents[2] / "screenshots"
+    dash_ss = (screenshots_dir or default_ss_dir) / "01_dashboard_overview.png"
     if dash_ss.exists():
+
         # Right side: Screenshot card
         s5.shapes.add_picture(str(dash_ss), Inches(6.8), Inches(4.7), Inches(5.53), Inches(2.2))
         # Left side: Assessment Highlights Card
