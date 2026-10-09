@@ -1,0 +1,10 @@
+Host,Port,Protocol,State,Service,Product,Version,Confidence,Latency_ms,Banner
+192.168.1.1,80,TCP,OPEN,HTTP,lighttpd,1.4.59,HIGH,1.90,lighttpd/1.4.59
+192.168.1.1,443,TCP,OPEN,HTTPS,TLS Gateway Admin,TLSv1.3,HIGH,2.10,TLSv1.3 (CN: gateway.local)
+192.168.1.1,53,TCP,OPEN,DNS,dnsmasq,2.85,HIGH,1.20,dnsmasq-2.85
+192.168.1.10,22,TCP,OPEN,SSH,OpenSSH,8.9p1,HIGH,4.10,SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.6
+192.168.1.10,3306,TCP,OPEN,MySQL,MySQL Server,8.0.35,HIGH,5.00,MySQL 8.0.35 Community
+192.168.1.10,6379,TCP,OPEN,Redis,Redis Key-Value Store,6.2.6,HIGH,3.80,Redis RESP (+PONG)
+192.168.1.15,21,TCP,OPEN,FTP,vsftpd,3.0.3,HIGH,5.80,220 (vsFTPd 3.0.3)
+192.168.1.15,23,TCP,OPEN,Telnet,Linux Telnetd,,HIGH,6.30,Debian GNU/Linux login:
+192.168.1.15,3389,TCP,OPEN,RDP,Remote Desktop Protocol,,HIGH,7.00,MS RDP Listener

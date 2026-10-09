@@ -1,0 +1,4 @@
+IP,Hostname,Status,Latency_ms,Open_Ports,Closed_Ports,Filtered_Ports,Findings_Count
+192.168.1.1,gateway.local,REACHABLE,1.80,3,0,0,3
+192.168.1.10,app-prod.internal,REACHABLE,4.20,3,0,0,5
+192.168.1.15,lab-test.local,REACHABLE,6.10,3,0,0,4
